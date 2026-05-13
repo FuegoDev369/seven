@@ -1,0 +1,11 @@
+# ── IA (choisir selon ton provider) ──────────────
+groq>=0.9.0                  # Gratuit — RECOMMANDÉ
+google-generativeai>=0.7.0   # Gratuit (alternative)
+# anthropic>=0.34.0          # Payant (décommenter plus tard)
+
+# ── Recherche web gratuite ────────────────────────
+duckduckgo-search>=6.0.0     # Aucune clé API requise
+
+# ── Utilitaires ───────────────────────────────────
+python-dotenv>=1.0.0
+requests>=2.31.0

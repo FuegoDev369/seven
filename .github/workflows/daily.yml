@@ -1,0 +1,37 @@
+name: ⚡ Seven — Daily Run
+
+on:
+  schedule:
+    - cron: '0 7 * * *'   # 7h UTC = 9h Paris = 8h Douala
+  workflow_dispatch:        # Déclenchement manuel
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 📦 Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: ⚡ Run Seven
+        env:
+          AI_PROVIDER:         groq           # groq | gemini | anthropic
+          GROQ_API_KEY:        ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY:      ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY:   ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN:  ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID:    ${{ secrets.TELEGRAM_CHAT_ID }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          TWITTER_USERNAME:    "@ahry369"
+          AUTHOR_NAME:         "FuegoDev"
+          CONTENT_TOPICS:      "Dev,AI,Web3,Education,Tech"
+          LANGUAGE:            "Français"
+        run: python main.py daily
