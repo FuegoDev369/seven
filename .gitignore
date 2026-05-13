@@ -1,0 +1,62 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ⚡ Seven — .gitignore
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# ── SECRETS (ne jamais commiter !) ────────
+.env
+*.env
+.env.*
+!.env.example
+
+# ── BASE DE DONNÉES locale ────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ── Python ────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.Python
+
+# ── Environnements virtuels ───────────────
+venv/
+env/
+.venv/
+.env/
+ENV/
+
+# ── Outils Python ─────────────────────────
+*.egg-info/
+dist/
+build/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# ── Logs ──────────────────────────────────
+*.log
+logs/
+
+# ── OS ────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Éditeurs ──────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Fichiers temporaires ──────────────────
+*.tmp
+*.bak
+tmp/
+temp/
