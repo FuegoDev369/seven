@@ -26,18 +26,30 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Commandes rapides :
-  python main.py ideas                         → 5 idées de tweets
-  python main.py ideas --topic "Python" -n 3  → Idées sur un sujet
-  python main.py ideas --thread               → Idées de threads
-  python main.py write --idea "Tips Git"      → Rédiger un tweet
-  python main.py write --thread --idea "AI"   → Rédiger un thread
-  python main.py write --reformat "tweet..."  → Améliorer un tweet
-  python main.py plan --week                  → Planning 7 jours
-  python main.py plan --show                  → Voir le planning
-  python main.py analyze "Mon tweet ici"      → Analyser un tweet
-  python main.py trends                       → Tendances actuelles
-  python main.py notify --test                → Tester les notifs
-  python main.py daily                        → Run complet (CI/CD)
+  python main.py ideas                              → 5 idées de tweets
+  python main.py ideas --topic "Python" -n 3       → Idées sur un sujet
+  python main.py ideas --thread                    → Idées de threads
+
+  python main.py write --idea "Tips Git"           → Tweet classique (3 versions)
+  python main.py write --thread --idea "AI"        → Thread 8 tweets
+  python main.py write --grand-ecart --idea "Git"  → Hook + Analogie + Exécution
+  python main.py write --bilingual --idea "Web3"   → Tweet EN + Reply FR
+  python main.py write --reformat "tweet..."       → Améliorer un tweet
+
+  python main.py bip                               → Build in Public (interactif)
+  python main.py bip --situation "mon bug"         → Galère → post authentique
+  python main.py bip --situation "..." --type win  → Victoire → post humble
+
+  python main.py sources                           → Toutes les sources
+  python main.py sources --source github           → GitHub Trending seulement
+  python main.py sources --source defi             → DeFiLlama seulement
+
+  python main.py plan --week                       → Planning 7 jours
+  python main.py plan --show                       → Voir le planning
+  python main.py analyze "Mon tweet ici"           → Analyser un tweet
+  python main.py trends                            → Tendances (DuckDuckGo + IA)
+  python main.py notify --test                     → Tester les notifs
+  python main.py daily                             → Run complet (GitHub Actions)
         """
     )
 
@@ -54,6 +66,20 @@ Commandes rapides :
     p.add_argument('--idea', '-i', type=str)
     p.add_argument('--reformat', '-r', type=str)
     p.add_argument('--thread', action='store_true')
+    p.add_argument('--grand-ecart', action='store_true', help='Hook + Analogie + Exécution')
+    p.add_argument('--bilingual', action='store_true', help='Tweet EN + Reply FR')
+
+    # bip
+    p = sub.add_parser('bip', help='Build in Public — galères, wins, learnings, progress')
+    p.add_argument('--situation', '-s', type=str)
+    p.add_argument('--type', '-t',
+                   choices=['struggle', 'win', 'learning', 'progress'],
+                   default=None)
+
+    # sources
+    p = sub.add_parser('sources', help='Hacker News · GitHub · DeFiLlama · Reddit')
+    p.add_argument('--source', '-s', type=str, default=None,
+                   help='hn | github | defi | reddit')
 
     # plan
     p = sub.add_parser('plan', help='Calendrier de contenu')
@@ -100,7 +126,24 @@ Commandes rapides :
 
     elif args.command == 'write':
         from modules.writer import WriterModule
-        WriterModule(config).run(idea=args.idea, reformat=args.reformat, thread=args.thread)
+        WriterModule(config).run(
+            idea        = args.idea,
+            reformat    = args.reformat,
+            thread      = args.thread,
+            grand_ecart = getattr(args, 'grand_ecart', False),
+            bilingual   = args.bilingual,
+        )
+
+    elif args.command == 'bip':
+        from modules.bip import BipModule
+        BipModule(config).run(
+            situation = args.situation,
+            bip_type  = args.type,
+        )
+
+    elif args.command == 'sources':
+        from modules.sources import SourcesModule
+        SourcesModule(config).run(source_filter=args.source)
 
     elif args.command == 'plan':
         from modules.planner import PlannerModule
@@ -141,21 +184,38 @@ def _notify(config, args):
 
 def _daily(config):
     print("⚡ Seven — Daily Run\n" + "─" * 50)
-    from modules.trends import TrendsModule
-    from modules.ideas  import IdeasModule
+    from modules.trends  import TrendsModule
+    from modules.ideas   import IdeasModule
+    from modules.sources import SourcesModule
 
-    print("📡 Veille tendances...")
+    # 1. Sources brutes
+    print("📡 Agrégation des sources (HN · GitHub · DeFiLlama · Reddit)...")
+    src   = SourcesModule(config)
+    data  = src.fetch_all()
+    raw   = src._format_raw(data)
+
+    # 2. Tendances IA
+    print("🔍 Analyse des tendances...")
     trends_text = TrendsModule(config).get_trending_topics()
 
+    # 3. Idées basées sur les deux
     print("💡 Génération d'idées...")
-    ideas_text = IdeasModule(config).generate(count=5, context=trends_text)
+    context    = f"{trends_text}\n\n{raw[:600]}"
+    ideas_text = IdeasModule(config).generate(count=5, context=context)
+
+    # 4. Suggestions sources IA
+    print("🤖 Analyse IA des sources...")
+    suggestions = src.analyze_and_suggest(raw)
 
     message = (
         "⚡ *Seven — Daily Briefing*\n\n"
         "📈 *Tendances du moment*\n"
         f"{trends_text}\n\n"
         "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "💡 *Idées de contenu aujourd'hui*\n"
+        "🔥 *Opportunités (Sources)*\n"
+        f"{suggestions}\n\n"
+        "━━━━━━━━━━━━━━━━━━━━\n\n"
+        "💡 *Idées de contenu*\n"
         f"{ideas_text}\n\n"
         "_by Seven · FuegoDev 🔥_"
     )

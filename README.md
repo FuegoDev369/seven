@@ -25,13 +25,15 @@ La recherche web fonctionne via **DuckDuckGo** — aucune clé API nécessaire.
 
 | Commande | Description |
 |----------|-------------|
-| `ideas`  | Génère des idées de tweets ou threads |
-| `write`  | Rédige des tweets / threads / reformate |
-| `plan`   | Crée et gère ton calendrier 7 jours |
-| `analyze`| Score et améliore tes tweets |
-| `trends` | Veille tendances Tech/AI/Web3 (web search) |
-| `notify` | Notifications Telegram / Discord |
-| `daily`  | Pipeline automatisé (GitHub Actions) |
+| `ideas`   | Génère des idées de tweets ou threads |
+| `write`   | Rédige tweets / threads / Grand Écart / bilingue |
+| `bip`     | Build in Public — galères, wins, learnings, progress |
+| `sources` | Agrège Hacker News · GitHub Trending · DeFiLlama · Reddit |
+| `plan`    | Crée et gère ton calendrier 7 jours |
+| `analyze` | Score et améliore tes tweets |
+| `trends`  | Veille tendances Tech/AI/Web3 (DuckDuckGo + IA) |
+| `notify`  | Notifications Telegram / Discord |
+| `daily`   | Pipeline complet automatisé (GitHub Actions) |
 
 ---
 
@@ -80,7 +82,23 @@ python main.py ideas --thread
 # RÉDACTION
 python main.py write --idea "Les bases de Git"
 python main.py write --thread --idea "Introduction au Web3"
+python main.py write --grand-ecart --idea "Termux pour les devs"
+python main.py write --bilingual --idea "AI Agents in 2025"
 python main.py write --reformat "Mon ancien tweet..."
+
+# BUILD IN PUBLIC
+python main.py bip
+python main.py bip --situation "J'ai passé 3h sur un bug de virgule"
+python main.py bip --situation "LUDUS v0.1 est enfin live" --type win
+python main.py bip --situation "J'ai découvert DuckDuckGo API" --type learning
+python main.py bip --situation "50% du backend Seven terminé" --type progress
+
+# SOURCES
+python main.py sources                    # Toutes les sources + analyse IA
+python main.py sources --source github    # GitHub Trending seulement
+python main.py sources --source hn        # Hacker News seulement
+python main.py sources --source defi      # DeFiLlama seulement
+python main.py sources --source reddit    # Reddit seulement
 
 # PLANNING
 python main.py plan --week
@@ -124,23 +142,25 @@ Seven tourne tout seul chaque matin à **7h UTC**.
 
 ```
 seven/
-├── main.py                  ← CLI
+├── main.py                  ← CLI (toutes les commandes)
 ├── core/
 │   ├── config.py            ← Configuration (.env)
-│   ├── ai.py                ← Client IA multi-provider
-│   ├── search.py            ← Recherche DuckDuckGo (gratuit)
+│   ├── ai.py                ← Client IA multi-provider (Groq/Gemini/Anthropic)
+│   ├── search.py            ← Recherche DuckDuckGo (gratuit, sans clé)
 │   └── database.py          ← SQLite local
 ├── modules/
-│   ├── ideas.py
-│   ├── writer.py
-│   ├── planner.py
-│   ├── analyzer.py
-│   └── trends.py
+│   ├── ideas.py             ← Génération d'idées
+│   ├── writer.py            ← Tweet / Thread / Grand Écart / Bilingue
+│   ├── bip.py               ← Build in Public (galères, wins, learning, progress)
+│   ├── sources.py           ← HackerNews · GitHub · DeFiLlama · Reddit
+│   ├── planner.py           ← Planning 7 jours
+│   ├── analyzer.py          ← Analyse & scoring
+│   └── trends.py            ← Veille tendances
 ├── notifiers/
 │   ├── telegram.py
 │   └── discord.py
 └── .github/workflows/
-    └── daily.yml
+    └── daily.yml            ← GitHub Actions (cron 7h UTC)
 ```
 
 ---
