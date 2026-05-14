@@ -3,7 +3,10 @@ Recherche web gratuite via DuckDuckGo.
 Aucune clé API requise.
 """
 
-from duckduckgo_search import DDGS
+try:
+    from ddgs import DDGS                    # nouveau nom du package
+except ImportError:
+    from duckduckgo_search import DDGS       # fallback ancienne version
 
 
 def search(query: str, max_results: int = 6) -> str:

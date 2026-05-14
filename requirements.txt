@@ -4,7 +4,7 @@ google-generativeai>=0.7.0   # Gratuit (alternative)
 # anthropic>=0.34.0          # Payant (décommenter plus tard)
 
 # ── Recherche web gratuite ────────────────────────
-duckduckgo-search>=6.0.0     # Aucune clé API requise
+ddgs>=6.0.0                  # DuckDuckGo Search (nouveau nom du package)
 
 # ── Utilitaires ───────────────────────────────────
 python-dotenv>=1.0.0
